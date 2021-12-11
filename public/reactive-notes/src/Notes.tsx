@@ -4,26 +4,21 @@ import { getNotes, storeNote } from './data/data';
 import { Note } from './models/note';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import { InputGroup } from 'react-bootstrap';
-import { FormControl } from 'react-bootstrap';
-import { create } from 'domain';
-
+import { Form, FormControl } from 'react-bootstrap';
 
 function Notes(){
-    
     const [notes, editNote] = useState<Note[]>([]);
-    const [newNote, setNewNote] = useState<string>("");
+    const [newNote, setNewNote] = useState<Note>({title: "", content: "", status: "new"});
     const [shownNotes, setShownNotes] = useState<Note[]>(notes);
     const [filter, setFilter] = useState<string>("all");
-    const noteField = useRef(null);
+    const noteTitleField = useRef(null);
+    const noteContentField = useRef(null);
 
     const addNote = () => {
-        storeNote({title: "", content: newNote, status: "new"}).then((response) => {
+        storeNote(newNote).then((response) => {
             editNote(response.data);
             // Empty the input after success
-            setNewNote("");
-            // Rerun filter
-            filterNotes(filter);
+            setNewNote({title: "", content: "", status: "new"});
         });
     }
 
@@ -32,7 +27,8 @@ function Notes(){
     }
 
     const typeNote = (event: any) => {
-        setNewNote(event.target.value);
+
+        setNewNote({...newNote, [event.target.name]: event.target.value});
     }
 
     const filterNotes = (status: string) => {
@@ -45,6 +41,10 @@ function Notes(){
             setShownNotes(notes.filter((value, index) => value.status === status));
         }
     }
+
+    useEffect(() => {
+        filterNotes(filter);
+    }, [notes])
 
     useEffect(() => {
         console.log("getting notes");
@@ -69,14 +69,18 @@ function Notes(){
     return (
         <div>
             <div className="grid-filters">
+            <div onClick={() => filterNotes("all")}> All </div>
                 {filterList}
             </div>
             <div className="grid-notes">
                 {itemList}
             </div>
             <div className="grid-addnote">
-                <FormControl ref={noteField} type="text" value={newNote} onChange={typeNote}></FormControl>
+                <FormControl ref={noteTitleField} type="text" name="title" value={newNote.title} onChange={typeNote} placeholder="Title..."></FormControl>
                 <Button variant="primary" onClick={addNote}> Add note </Button>
+            </div>
+            <div className="textarea-container">
+                <FormControl as="textarea" rows={3} ref={noteContentField} name="content" value={newNote.content} onChange={typeNote} placeholder="Content..."></FormControl>
             </div>
         </div>
     );

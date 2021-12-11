@@ -13,12 +13,12 @@ let notes = [
     {
         title: "Store",
         content: "Remember to go to the store",
-        status: "done",
+        status: "Done",
     },
     {
         title: "Anniversary",
         content: "31.7",
-        status: "in_progress",
+        status: "In progress",
     }
 ];
 
