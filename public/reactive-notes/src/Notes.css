@@ -2,13 +2,6 @@ ul > li {
     list-style: none;
 }
 
-.grid-notes {
-    display:grid;
-    gap: 0.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 4fr));
-    margin-bottom: 1em;
-}
-
 .grid-addnote {
     display: grid;
     gap: 0.5rem;
@@ -31,15 +24,5 @@ ul > li {
 }
 .textarea-container {
     margin-top: 0.5em;
-}
-
-.status-new {
-    border: 2px solid var(--new) !important;
-}
-.status-in-progress {
-    border: 2px solid var(--progress) !important;
-}
-.status-done {
-    border: 2px solid var(--complete) !important;
 }
 

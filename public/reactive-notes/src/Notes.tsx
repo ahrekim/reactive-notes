@@ -27,7 +27,10 @@ function Notes(){
     const formIsValid = () => (newNote.title || (newNote.title && newNote.title)) ? true : false;
 
     const createCard = (note: Note, key: any) => {
-        return <Card key={key} className={`note-card status-${note.status.replace(/\s+/g, '-').toLowerCase()}`}> <Card.Title> {note.title} </Card.Title> <Card.Text> {note.content} </Card.Text></Card>;
+        return <div key={key} className={`max-h-32 overflow-hidden rounded-lg bg-opacity-70 shadow-md bg-slate-800 text-stone-50 note-card hover:bg-opacity-90 status-${note.status.replace(/\s+/g, '-').toLowerCase()}`}>
+            <Card.Title> {note.title} </Card.Title>
+            <Card.Text> {note.content} </Card.Text>
+        </div>;
     }
 
     const typeNote = (event: any) => {
@@ -60,9 +63,9 @@ function Notes(){
 
     // Unique status names of notes and set as filters
     notes.map((note, key) => note.status).filter((value, index, self) => self.indexOf(value) === index).forEach((status, index) => {
-        let selectedClass = "bg-violet-800 hover:bg-gradient-to-t from-fuchsia-600 bg-violet-500 text-sky-300";
+        let selectedClass = "bg-violet-800 hover:bg-gradient-to-tl from-fuchsia-600 to-slate-900 bg-slate-900 bg-opacity-70 drop-shadow-md text-sky-300";
         if(status === filter){
-            selectedClass = "bg-gradient-to-t from-fuchsia-600 to-[#F26419]";
+            selectedClass = "bg-gradient-to-tl from-fuchsia-600 to-violet-800";
         }
         filterList.push(<div key={index} onClick={() => filterNotes(status)} className={'rounded-full '+selectedClass}> {status} </div>);
     });
@@ -75,14 +78,14 @@ function Notes(){
     return (
         <div className="backdrop-opacity-10">
             <div className="grid-filters">
-            <div onClick={() => filterNotes("all")} className={(filter == 'all') ? 'rounded-full bg-gradient-to-t from-fuchsia-600  to-[#F26419]' : 'text-sky-300 rounded-full bg-violet-800'}> All </div>
+                <div onClick={() => filterNotes("all")} className={(filter == 'all') ? 'rounded-full bg-gradient-to-tl from-fuchsia-600  to-violet-800' : 'hover:bg-gradient-to-tl from-fuchsia-600 to-slate-900 text-stone-50 rounded-full bg-slate-900 bg-opacity-70 shadow-md'}> All </div>
                 {filterList}
             </div>
-            <div className="grid-notes">
+            <div className="grid grid-flow-row gap-2 grid-cols-2 md:grid-cols-3 ">
                 {itemList}
             </div>
-            <div className="grid-addnote">
-                <input className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+            <div className="grid-addnote mt-4">
+                <input className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
                     ref={noteTitleField}
                     type="text"
                     name="title"
@@ -92,7 +95,7 @@ function Notes(){
                 />
                 <button
                     type="button"
-                    className="group relative w-full flex justify-center py-2 px-4 border-1 border-fuchsia-600 text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="group relative w-full flex justify-center py-2 px-4 text-stone-50 text-sm font-medium rounded-lg bg-opacity-10 shadow-md  bg-gradient-to-tl from-fuchsia-600  to-violet-800"
                     onClick={addNote}
                     disabled={!formIsValid()}
                 >
@@ -100,7 +103,14 @@ function Notes(){
               </button>
             </div>
             <div className="textarea-container">
-                <FormControl as="textarea" rows={3} ref={noteContentField} name="content" value={newNote.content} onChange={typeNote} placeholder="Content..."></FormControl>
+            <textarea className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
+                    ref={noteContentField}
+                    rows={5}
+                    name="content"
+                    onChange={typeNote}
+                    placeholder="Content..."
+                    value={newNote.content}
+                >{newNote.content}</textarea>
             </div>
         </div>
     );

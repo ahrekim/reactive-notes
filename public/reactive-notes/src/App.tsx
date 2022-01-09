@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App: FC = () => {
   return (
-    <div className="bg-gradient-to-br to-slate-50 from-slate-300 dark:to-purple-500 dark:via-slate-700 dark:from-slate-900 min-h-screen">
+    <div className="bg-gradient-to-br to-purple-500 via-slate-600 from-slate-900 min-h-screen">
     <div className="App max-w-prose">
       <h1 className="text-4xl text-sky-500 font-light">Reactive notes</h1>
       <div className="nav">
