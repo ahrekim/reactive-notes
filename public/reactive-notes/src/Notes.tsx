@@ -15,19 +15,22 @@ function Notes(){
     const noteContentField = useRef(null);
 
     const addNote = () => {
-        storeNote(newNote).then((response) => {
-            editNote(response.data);
-            // Empty the input after success
-            setNewNote({title: "", content: "", status: "new"});
-        });
+        if(formIsValid()){
+            storeNote(newNote).then((response) => {
+                editNote(response.data);
+                // Empty the input after success
+                setNewNote({title: "", content: "", status: "new"});
+            });
+        }
     }
 
+    const formIsValid = () => (newNote.title || (newNote.title && newNote.title)) ? true : false;
+
     const createCard = (note: Note, key: any) => {
-        return <Card key={key} className="note-card"> <Card.Title> {note.title} </Card.Title> <Card.Text> {note.content} </Card.Text></Card>;
+        return <Card key={key} className={`note-card status-${note.status.replace(/\s+/g, '-').toLowerCase()}`}> <Card.Title> {note.title} </Card.Title> <Card.Text> {note.content} </Card.Text></Card>;
     }
 
     const typeNote = (event: any) => {
-
         setNewNote({...newNote, [event.target.name]: event.target.value});
     }
 
@@ -47,7 +50,6 @@ function Notes(){
     }, [notes])
 
     useEffect(() => {
-        console.log("getting notes");
         getNotes()?.then( res => {
             editNote(res.data)
             setShownNotes(res.data);
@@ -58,7 +60,11 @@ function Notes(){
 
     // Unique status names of notes and set as filters
     notes.map((note, key) => note.status).filter((value, index, self) => self.indexOf(value) === index).forEach((status, index) => {
-        filterList.push(<div key={index} onClick={() => filterNotes(status)}> {status} </div>);
+        let selectedClass = "bg-violet-800 hover:bg-gradient-to-t from-fuchsia-600 bg-violet-500 text-sky-300";
+        if(status === filter){
+            selectedClass = "bg-gradient-to-t from-fuchsia-600 to-[#F26419]";
+        }
+        filterList.push(<div key={index} onClick={() => filterNotes(status)} className={'rounded-full '+selectedClass}> {status} </div>);
     });
 
     // Create the note cards
@@ -67,17 +73,31 @@ function Notes(){
     })
 
     return (
-        <div>
+        <div className="backdrop-opacity-10">
             <div className="grid-filters">
-            <div onClick={() => filterNotes("all")}> All </div>
+            <div onClick={() => filterNotes("all")} className={(filter == 'all') ? 'rounded-full bg-gradient-to-t from-fuchsia-600  to-[#F26419]' : 'text-sky-300 rounded-full bg-violet-800'}> All </div>
                 {filterList}
             </div>
             <div className="grid-notes">
                 {itemList}
             </div>
             <div className="grid-addnote">
-                <FormControl ref={noteTitleField} type="text" name="title" value={newNote.title} onChange={typeNote} placeholder="Title..."></FormControl>
-                <Button variant="primary" onClick={addNote}> Add note </Button>
+                <input className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                    ref={noteTitleField}
+                    type="text"
+                    name="title"
+                    value={newNote.title}
+                    onChange={typeNote}
+                    placeholder="Title..."
+                />
+                <button
+                    type="button"
+                    className="group relative w-full flex justify-center py-2 px-4 border-1 border-fuchsia-600 text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={addNote}
+                    disabled={!formIsValid()}
+                >
+                Add note
+              </button>
             </div>
             <div className="textarea-container">
                 <FormControl as="textarea" rows={3} ref={noteContentField} name="content" value={newNote.content} onChange={typeNote} placeholder="Content..."></FormControl>

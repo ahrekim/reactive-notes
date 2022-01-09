@@ -28,10 +28,18 @@ ul > li {
 
 .grid-filters > div {
     padding: 0.5em;
-    background-color: azure;
-    border-radius: 25px;
 }
 .textarea-container {
     margin-top: 0.5em;
+}
+
+.status-new {
+    border: 2px solid var(--new) !important;
+}
+.status-in-progress {
+    border: 2px solid var(--progress) !important;
+}
+.status-done {
+    border: 2px solid var(--complete) !important;
 }
 

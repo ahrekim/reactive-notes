@@ -2,9 +2,14 @@ body {
   font-family: 'Lato', sans-serif;
 }
 
+:root {
+  --new: #b5179e;
+  --progress: #7209b7;
+  --complete: #560bad;
+}
+
 .App {
   text-align: center;
-  background-color: aquamarine;
   width: 90%;
   margin: auto;
   padding: 5px;
@@ -12,10 +17,6 @@ body {
 
 .nav {
   height: 50px;
-  width: 100;
-}
-
-.nav-link {
-  margin: 5px
+  width: 100%;
 }
 
