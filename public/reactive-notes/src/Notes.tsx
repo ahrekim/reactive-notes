@@ -11,6 +11,7 @@ function Notes(){
     const [newNote, setNewNote] = useState<Note>({title: "", content: "", status: "new"});
     const [shownNotes, setShownNotes] = useState<Note[]>(notes);
     const [filter, setFilter] = useState<string>("all");
+    const [openCard, setOpenCard] = useState<number>(0);
     const noteTitleField = useRef(null);
     const noteContentField = useRef(null);
 
@@ -26,10 +27,20 @@ function Notes(){
 
     const formIsValid = () => (newNote.title || (newNote.title && newNote.title)) ? true : false;
 
+
+
     const createCard = (note: Note, key: any) => {
-        return <div key={key} className={`max-h-32 overflow-hidden rounded-lg bg-opacity-70 shadow-md bg-slate-800 text-stone-50 note-card hover:bg-opacity-90 status-${note.status.replace(/\s+/g, '-').toLowerCase()}`}>
+        return <div key={key} className={`transition relative ease-in-out delay-150 rounded-lg bg-opacity-70 shadow-md bg-slate-800 text-stone-50 note-card hover:bg-opacity-90 status-${note.status.replace(/\s+/g, '-').toLowerCase()}`}>
             <Card.Title> {note.title} </Card.Title>
-            <Card.Text> {note.content} </Card.Text>
+            <div className={"max-h-32 overflow-hidden pb-16 font-light"}> {note.content} </div>
+            <div className="actions flex flex-wrap overflow-x-hidden absolute bottom-0 pb-2">
+                <button className="chip p-2 rounded-lg mr-2 bg-slate-900 bg-opacity-50 col-span-1 w-auto">
+                    Edit
+                </button>
+                <button className="chip p-2 rounded-lg mr-2 bg-red-700 bg-opacity-50 col-span-1 w-auto">
+                    Delete
+                </button>
+            </div>
         </div>;
     }
 
@@ -81,7 +92,7 @@ function Notes(){
                 <div onClick={() => filterNotes("all")} className={(filter == 'all') ? 'rounded-full bg-gradient-to-tl from-fuchsia-600  to-violet-800' : 'hover:bg-gradient-to-tl from-fuchsia-600 to-slate-900 text-stone-50 rounded-full bg-slate-900 bg-opacity-70 shadow-md'}> All </div>
                 {filterList}
             </div>
-            <div className="grid grid-flow-row gap-2 grid-cols-2 md:grid-cols-3 ">
+            <div className="grid grid-flow-row gap-2 grid-cols-2 md:grid-cols-3">
                 {itemList}
             </div>
             <div className="grid-addnote mt-4">
@@ -110,7 +121,7 @@ function Notes(){
                     onChange={typeNote}
                     placeholder="Content..."
                     value={newNote.content}
-                >{newNote.content}</textarea>
+                ></textarea>
             </div>
         </div>
     );

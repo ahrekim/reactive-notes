@@ -5,6 +5,7 @@ const path = require("path");
 const console = require("console");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const crypto = require("crypto");
 // Expose folders
 app.use(express.static(path.join(__dirname, './public/reactive-notes/build')));
 app.use(express.static(path.join(__dirname, './public/')));
@@ -12,11 +13,13 @@ app.use(express.static(path.join(__dirname, './public/')));
 let notes = [
     {
         title: "Store",
+        uuid: crypto.randomUUID(),
         content: "Remember to go to the store",
         status: "Done",
     },
     {
         title: "Anniversary",
+        uuid: crypto.randomUUID(),
         content: "31.7",
         status: "In progress",
     }
@@ -45,9 +48,14 @@ app.get("/api/notes", (request, response) => {
     response.json(notes);
 })
 
-
-app.post("/api/newnote", (request, response) => {
-    notes = [...notes, request.body];
+app.post("/api/note", (request, response) => {
+    let data = request.body;
+    if(data.uuid){
+        // Update existing
+    } else {
+        data.uuid = crypto.randomUUID();
+        notes = [...notes, data];
+    }
     response.json(notes);
 })
 

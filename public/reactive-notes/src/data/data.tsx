@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Note } from "../models/note";
 import { User } from "../models/user";
-    
+
 export function storeUser(user: User){
     window.localStorage.setItem("user", JSON.stringify(user));
 }
@@ -22,7 +22,7 @@ export function getNotes(){
 }
 
 export function storeNote(note: Note){
-    return axios.post<Note[]>(`http://localhost:8080/api/newnote`, note);
+    return axios.post<Note[]>(`http://localhost:8080/api/note`, note);
     // if(getUser()){
     // }
 }

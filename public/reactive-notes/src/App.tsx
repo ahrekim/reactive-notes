@@ -1,9 +1,12 @@
 import React, { FC } from 'react';
 import './App.css';
 import { Routes, Route, Link, Outlet } from 'react-router-dom';
-import Auth from './Auth';
 import Notes from './Notes';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+import Home from './Home';
+
 
 
 
@@ -17,7 +20,7 @@ const App: FC = () => {
         <Link className="text-sky-500 hover:text-fuchsia-600 mr-4" to="/notes">Notes</Link>
       </div>
       <Routes>
-        <Route path="/" element={<Auth />} />
+        <Route path="/" element={<Home />} />
         <Route path="notes" element={<Notes />} />
       </Routes>
     </div>
