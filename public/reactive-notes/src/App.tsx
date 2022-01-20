@@ -1,28 +1,88 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import './App.css';
 import { Routes, Route, Link, Outlet } from 'react-router-dom';
 import Notes from './Notes';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { getAuth, GoogleAuthProvider, signInWithPopup, Auth } from 'firebase/auth'
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { FIREBASE } from './env';
 
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-import Home from './Home';
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: FIREBASE.apiKey,
+  authDomain: FIREBASE.authDomain,
+  projectId: FIREBASE.projectId,
+  storageBucket: FIREBASE.storageBucket,
+  messagingSenderId: FIREBASE.messagingSenderId,
+  appId: FIREBASE.appId,
+  measurementId: FIREBASE.measurementId
+};
 
-
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 
 const App: FC = () => {
+  const auth = getAuth();
+  const [user, setUser] = useState(auth.currentUser);
+
+  auth.onAuthStateChanged(user => {
+    setUser(user);
+  })
+
+  const login = () => {
+    const provider = new GoogleAuthProvider;
+
+    signInWithPopup(auth, provider).then(authData => {
+      console.log(authData);
+    });
+  }
+
+  const logout = () => {
+    auth.signOut()
+  }
   return (
-    <div className="bg-gradient-to-br to-purple-500 via-slate-600 from-slate-900 min-h-screen">
+    <div className="dark:bg-gradient-to-b to-purple-500 via-slate-600 from-slate-900 min-h-screen">
     <div className="App max-w-prose">
-      <h1 className="text-4xl text-sky-500 font-light">Reactive notes</h1>
-      <div className="nav">
-        <Link className="text-sky-500 hover:text-fuchsia-600 ml-1 mr-4" to="/">Auth</Link>
-        <Link className="text-sky-500 hover:text-fuchsia-600 mr-4" to="/notes">Notes</Link>
+      <div className="grid grid-cols-2 gap-1 mt-2 mb-4">
+        <div className="place-self-start">
+          <h1 className="text-xl text-sky-600">Reactive notes</h1>
+          {user ?
+          <p className="text-sky-600">
+              Hello {user.displayName}!
+          </p>
+          : ""}
+        </div>
+        <div className="place-self-end">
+        {user ?
+          <div className="loggedIn">
+            <button
+            type="button"
+            className="group relative w-full flex justify-center py-2 px-4 text-stone-50 text-sm font-medium rounded-lg bg-opacity-10 shadow-md  bg-gradient-to-tl from-red-600  to-violet-800"
+            onClick={logout}
+            >
+            Logout
+            </button>
+          </div>
+          :
+            <button
+            type="button"
+            className="group relative w-full flex justify-center py-2 px-4 text-stone-50 text-sm font-medium rounded-lg bg-opacity-10 shadow-md  bg-gradient-to-tl from-fuchsia-600  to-violet-800"
+            onClick={login}
+            >
+            Login with Google
+            </button>
+          }
+        </div>
       </div>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="notes" element={<Notes />} />
-      </Routes>
+      {user ?
+      <Notes user={user} firebaseApp={app} />
+      : ""}
     </div>
     </div>
   );

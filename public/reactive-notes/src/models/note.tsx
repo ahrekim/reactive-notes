@@ -1,5 +1,5 @@
 export type Note = {
-    uuid?:string;
+    uid?:string;
     title: string;
     content: string;
     status: string;

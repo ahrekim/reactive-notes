@@ -5,8 +5,10 @@ import { Note } from './models/note';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { Form, FormControl } from 'react-bootstrap';
+import {getFirestore, collection, addDoc, getDocs, onSnapshot, where, query} from 'firebase/firestore'
+import { getAuth } from '@firebase/auth';
 
-function Notes(){
+function Notes(props: any){
     const [notes, editNote] = useState<Note[]>([]);
     const [newNote, setNewNote] = useState<Note>({title: "", content: "", status: "new"});
     const [shownNotes, setShownNotes] = useState<Note[]>(notes);
@@ -14,8 +16,18 @@ function Notes(){
     const [openCard, setOpenCard] = useState<number>(0);
     const noteTitleField = useRef(null);
     const noteContentField = useRef(null);
+    const db = getFirestore(props.firebaseApp);
+
+    // const docRef = addDoc(collection(db, 'notes'), {
+    //     title: 'Test',
+    //     content: 'Test content',
+    //     status: "New",
+    //     uid: props.user.uid
+    // });
+
 
     const addNote = () => {
+
         if(formIsValid()){
             storeNote(newNote).then((response) => {
                 editNote(response.data);
@@ -64,9 +76,14 @@ function Notes(){
     }, [notes])
 
     useEffect(() => {
-        getNotes()?.then( res => {
-            editNote(res.data)
-            setShownNotes(res.data);
+        let q = query(collection(db, 'notes'), where("uid", "==", props.user.uid));
+        getDocs(q).then((data) => {
+            let collectedNotes: any = [];
+            data.forEach((doc) => {
+                collectedNotes = [...collectedNotes, doc.data()];
+            });
+            editNote(collectedNotes)
+            setShownNotes(collectedNotes);
         });
     }, [editNote])
 
@@ -88,41 +105,46 @@ function Notes(){
 
     return (
         <div className="backdrop-opacity-10">
-            <div className="grid-filters">
-                <div onClick={() => filterNotes("all")} className={(filter == 'all') ? 'rounded-full bg-gradient-to-tl from-fuchsia-600  to-violet-800' : 'hover:bg-gradient-to-tl from-fuchsia-600 to-slate-900 text-stone-50 rounded-full bg-slate-900 bg-opacity-70 shadow-md'}> All </div>
-                {filterList}
+            {props.user ?
+            <div>
+                <div className="grid-filters">
+                    <div onClick={() => filterNotes("all")} className={(filter == 'all') ? 'rounded-full bg-gradient-to-tl from-fuchsia-600  to-violet-800 text-stone-50' : 'hover:bg-gradient-to-tl from-fuchsia-600 to-slate-900 text-stone-50 rounded-full bg-slate-900 bg-opacity-70 shadow-md'}> All </div>
+                    {filterList}
+                </div>
+                <div className="grid grid-flow-row gap-2 grid-cols-2 md:grid-cols-3">
+                    {itemList}
+                </div>
+                <div className="grid-addnote mt-4">
+                    <input className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
+                        ref={noteTitleField}
+                        type="text"
+                        name="title"
+                        value={newNote.title}
+                        onChange={typeNote}
+                        placeholder="Title..."
+                    />
+                    <button
+                        type="button"
+                        className="group relative w-full flex justify-center py-2 px-4 text-stone-50 text-sm font-medium rounded-lg bg-opacity-10 shadow-md  bg-gradient-to-tl from-fuchsia-600  to-violet-800"
+                        onClick={addNote}
+                        disabled={!formIsValid()}
+                    >
+                    Add note
+                </button>
+                </div>
+                <div className="textarea-container">
+                <textarea className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
+                        ref={noteContentField}
+                        rows={5}
+                        name="content"
+                        onChange={typeNote}
+                        placeholder="Content..."
+                        value={newNote.content}
+                    ></textarea>
+                </div>
             </div>
-            <div className="grid grid-flow-row gap-2 grid-cols-2 md:grid-cols-3">
-                {itemList}
-            </div>
-            <div className="grid-addnote mt-4">
-                <input className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
-                    ref={noteTitleField}
-                    type="text"
-                    name="title"
-                    value={newNote.title}
-                    onChange={typeNote}
-                    placeholder="Title..."
-                />
-                <button
-                    type="button"
-                    className="group relative w-full flex justify-center py-2 px-4 text-stone-50 text-sm font-medium rounded-lg bg-opacity-10 shadow-md  bg-gradient-to-tl from-fuchsia-600  to-violet-800"
-                    onClick={addNote}
-                    disabled={!formIsValid()}
-                >
-                Add note
-              </button>
-            </div>
-            <div className="textarea-container">
-            <textarea className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
-                    ref={noteContentField}
-                    rows={5}
-                    name="content"
-                    onChange={typeNote}
-                    placeholder="Content..."
-                    value={newNote.content}
-                ></textarea>
-            </div>
+            :
+            ""}
         </div>
     );
 }
