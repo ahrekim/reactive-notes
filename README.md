@@ -5,5 +5,8 @@ Simple app created for getting familiar with react and firebase.
 - node
 - react
 
+## Firebase CLI
+Deploy: ```firebase deploy```
+
 ## License
 [Unlicense](https://unlicense.org)
