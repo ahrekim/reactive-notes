@@ -26,4 +26,5 @@ yarn-error.log*
 src/env.tsx
 .firebaserc
 firebase.json
-./.firebase
+.firebase
+

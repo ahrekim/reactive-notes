@@ -1,59 +1,93 @@
 import { useEffect, useRef, useState } from 'react';
 import './Notes.css';
+import EditModal from './EditModal';
 import { getNotes, storeNote } from './data/data';
 import { Note } from './models/note';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { Form, FormControl } from 'react-bootstrap';
-import {getFirestore, collection, addDoc, getDocs, onSnapshot, where, query} from 'firebase/firestore'
+import {getFirestore, collection, addDoc, getDocs, onSnapshot, where, query, doc, deleteDoc, getDoc, DocumentReference, setDoc} from 'firebase/firestore'
 import { getAuth } from '@firebase/auth';
+import DeleteModal from './DeleteModal';
 
 function Notes(props: any){
-    const [notes, editNote] = useState<Note[]>([]);
-    const [newNote, setNewNote] = useState<Note>({title: "", content: "", status: "new"});
+    const [notes, setEditNote] = useState<Note[]>([]);
+    const [newNote, setNewNote] = useState<Note>({title: "", content: "", status: "New"});
     const [shownNotes, setShownNotes] = useState<Note[]>(notes);
     const [filter, setFilter] = useState<string>("all");
-    const [openCard, setOpenCard] = useState<number>(0);
+    const [openCard, setOpenCard] = useState<Note>({title: "", content: "", status: "New"});
+    const [cardIsOpen, setCardIsOpen] = useState<boolean>(false);
+    const [deleteCardIsOpen, setDeleteCardIsOpen] = useState<boolean>(false);
     const noteTitleField = useRef(null);
     const noteContentField = useRef(null);
     const db = getFirestore(props.firebaseApp);
 
-    // const docRef = addDoc(collection(db, 'notes'), {
-    //     title: 'Test',
-    //     content: 'Test content',
-    //     status: "New",
-    //     uid: props.user.uid
-    // });
-
+    const typeEditNote = (event: any) => {
+        setOpenCard({...openCard, [event.target.name]: event.target.value});
+    }
 
     const addNote = () => {
-
         if(formIsValid()){
-            storeNote(newNote).then((response) => {
-                editNote(response.data);
+            let note = newNote;
+            note.uid = props.user.uid;
+            addDoc(collection(db, 'notes'), note).then(() => {
                 // Empty the input after success
-                setNewNote({title: "", content: "", status: "new"});
-            });
+                setNewNote({title: "", content: "", status: "New"});
+                getDocuments(true);
+            })
         }
     }
 
     const formIsValid = () => (newNote.title || (newNote.title && newNote.title)) ? true : false;
-
-
 
     const createCard = (note: Note, key: any) => {
         return <div key={key} className={`transition relative ease-in-out delay-150 rounded-lg bg-opacity-70 shadow-md bg-slate-800 text-stone-50 note-card hover:bg-opacity-90 status-${note.status.replace(/\s+/g, '-').toLowerCase()}`}>
             <Card.Title> {note.title} </Card.Title>
             <div className={"max-h-32 overflow-hidden pb-16 font-light"}> {note.content} </div>
             <div className="actions flex flex-wrap overflow-x-hidden absolute bottom-0 pb-2">
-                <button className="chip p-2 rounded-lg mr-2 bg-slate-900 bg-opacity-50 col-span-1 w-auto">
+                <button onClick={() => editNote(note)} className="chip p-2 rounded-lg mr-2 bg-slate-900 bg-opacity-50 col-span-1 w-auto">
                     Edit
                 </button>
-                <button className="chip p-2 rounded-lg mr-2 bg-red-700 bg-opacity-50 col-span-1 w-auto">
+                <button onClick={() => deleteNote(note)} className="chip p-2 rounded-lg mr-2 bg-red-700 bg-opacity-50 col-span-1 w-auto">
                     Delete
                 </button>
             </div>
         </div>;
+    }
+
+    const editModalOpen = (value: boolean) => {
+        setCardIsOpen(value);
+    }
+    const deleteModalOpen = (value: boolean) => {
+        setDeleteCardIsOpen(value);
+    }
+
+    const deleteNote = (note: Note) => {
+        setOpenCard(note);
+        setDeleteCardIsOpen(true);
+    }
+
+    const confirmDelete = () => {
+        if(openCard.id){
+            deleteDoc(doc(db, 'notes', openCard.id)).then( () => {
+                getDocuments(true);
+                setDeleteCardIsOpen(false);
+            });
+        }
+    }
+
+    const editNote = (note: Note) => {
+        setOpenCard(note);
+        setCardIsOpen(true);
+    }
+
+    const confirmUpdate = () => {
+        if(openCard.id){
+            setDoc(doc(db, 'notes', openCard.id), openCard).then(() => {
+                getDocuments(true);
+                setCardIsOpen(false);
+            })
+        }
     }
 
     const typeNote = (event: any) => {
@@ -71,21 +105,25 @@ function Notes(props: any){
         }
     }
 
-    useEffect(() => {
-        filterNotes(filter);
-    }, [notes])
-
-    useEffect(() => {
+    const getDocuments = (updateFilters: boolean) => {
         let q = query(collection(db, 'notes'), where("uid", "==", props.user.uid));
         getDocs(q).then((data) => {
             let collectedNotes: any = [];
             data.forEach((doc) => {
-                collectedNotes = [...collectedNotes, doc.data()];
+                let data = doc.data()
+                data.id = doc.id;
+                collectedNotes = [...collectedNotes, data];
             });
-            editNote(collectedNotes)
-            setShownNotes(collectedNotes);
+            setEditNote(collectedNotes)
+            if(updateFilters){
+                setShownNotes(collectedNotes);
+            }
         });
-    }, [editNote])
+    }
+
+    useEffect(() => {
+        getDocuments(true);
+    }, [setEditNote])
 
     let filterList: any[] = [];
 
@@ -133,18 +171,21 @@ function Notes(props: any){
                 </button>
                 </div>
                 <div className="textarea-container">
-                <textarea className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
-                        ref={noteContentField}
-                        rows={5}
-                        name="content"
-                        onChange={typeNote}
-                        placeholder="Content..."
-                        value={newNote.content}
-                    ></textarea>
+                    <textarea className="p-4 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md bg-slate-900 shadow-md bg-opacity-70 text-stone-50"
+                            ref={noteContentField}
+                            rows={5}
+                            name="content"
+                            onChange={typeNote}
+                            placeholder="Content..."
+                            value={newNote.content}
+                        >
+                    </textarea>
                 </div>
             </div>
             :
             ""}
+            <EditModal open={cardIsOpen} note={openCard} typeEditNoteFn={typeEditNote} editModalOpenFn={editModalOpen} confirmUpdateFn={confirmUpdate} ></EditModal>
+            <DeleteModal open={deleteCardIsOpen} note={openCard} deleteModalOpenFn={deleteModalOpen} confirmDeleteFn={confirmDelete}></DeleteModal>
         </div>
     );
 }

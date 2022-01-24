@@ -47,16 +47,11 @@ const App: FC = () => {
     auth.signOut()
   }
   return (
-    <div className="dark:bg-gradient-to-b to-purple-500 via-slate-600 from-slate-900 min-h-screen">
+    <div className="dark:bg-gradient-to-b dark:to-purple-500 dark:via-slate-600 dark:from-slate-900 bg-gradient-to-b to-purple-500 via-stone-200 from-white  min-h-screen">
     <div className="App max-w-prose">
       <div className="grid grid-cols-2 gap-1 mt-2 mb-4">
         <div className="place-self-start">
-          <h1 className="text-xl text-sky-600">Reactive notes</h1>
-          {user ?
-          <p className="text-sky-600">
-              Hello {user.displayName}!
-          </p>
-          : ""}
+          <h1 className="text-xl dark:text-white text-slate-900">Reactive notes</h1>
         </div>
         <div className="place-self-end">
         {user ?
@@ -66,7 +61,8 @@ const App: FC = () => {
             className="group relative w-full flex justify-center py-2 px-4 text-stone-50 text-sm font-medium rounded-lg bg-opacity-10 shadow-md  bg-gradient-to-tl from-red-600  to-violet-800"
             onClick={logout}
             >
-            Logout
+            Logout <br />
+            {user.displayName}
             </button>
           </div>
           :
