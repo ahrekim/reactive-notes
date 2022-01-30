@@ -41,7 +41,8 @@ export default function EditModal(props: {open: boolean; note?: Note; typeEditNo
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             {props.note ?
-            <div className="inline-block align-bottom bg-slate-300 bg-opacity-50 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div className="pt-2 inline-block align-top bg-slate-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <h1 className='m-4 text-slate-50 font-mono text-md'>Edit</h1>
               <div className="px-4 pb-4 sm:p-6 sm:pb-4">
                 <div>
                 <div>
@@ -67,7 +68,7 @@ export default function EditModal(props: {open: boolean; note?: Note; typeEditNo
                 </div>
                 </div>
               </div>
-              <div className="bg-slate-300 bg-opacity-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <div className="bg-slate-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-tl from-fuchsia-600  to-violet-800 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"

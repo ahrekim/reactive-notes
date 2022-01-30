@@ -5,8 +5,8 @@ Simple app created for getting familiar with react and firebase.
 - node
 - react
 
-## Firebase CLI
-Deploy: ```firebase deploy```
+## Firebase CLI cheatsheet
+Deploy to firebase: ```firebase deploy```
 
 ## License
 [Unlicense](https://unlicense.org)

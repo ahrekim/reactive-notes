@@ -7,6 +7,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, Auth } from 'firebase/aut
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { FIREBASE } from './env';
+import Home from './Home';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -78,7 +79,9 @@ const App: FC = () => {
       </div>
       {user ?
       <Notes user={user} firebaseApp={app} />
-      : ""}
+      :
+      <Home />
+      }
     </div>
     </div>
   );

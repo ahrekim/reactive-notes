@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import './Notes.css';
 import EditModal from './EditModal';
-import { getNotes, storeNote } from './data/data';
 import { Note } from './models/note';
-import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import { Form, FormControl } from 'react-bootstrap';
-import {getFirestore, collection, addDoc, getDocs, onSnapshot, where, query, doc, deleteDoc, getDoc, DocumentReference, setDoc} from 'firebase/firestore'
-import { getAuth } from '@firebase/auth';
+import {getFirestore, collection, addDoc, getDocs, where, query, doc, deleteDoc, setDoc} from 'firebase/firestore'
 import DeleteModal from './DeleteModal';
 
 function Notes(props: any){
@@ -125,30 +121,15 @@ function Notes(props: any){
         getDocuments(true);
     }, [setEditNote])
 
-    let filterList: any[] = [];
-
-    // Unique status names of notes and set as filters
-    notes.map((note, key) => note.status).filter((value, index, self) => self.indexOf(value) === index).forEach((status, index) => {
-        let selectedClass = "bg-violet-800 hover:bg-gradient-to-tl from-fuchsia-600 to-slate-900 bg-slate-900 bg-opacity-70 drop-shadow-md text-sky-300";
-        if(status === filter){
-            selectedClass = "bg-gradient-to-tl from-fuchsia-600 to-violet-800";
-        }
-        filterList.push(<div key={index} onClick={() => filterNotes(status)} className={'rounded-full '+selectedClass}> {status} </div>);
-    });
-
     // Create the note cards
     let itemList = shownNotes.map((note, key) => {
         return createCard(note, key);
     })
 
     return (
-        <div className="backdrop-opacity-10">
+        <div className="backdrop-opacity-10 pt-4">
             {props.user ?
             <div>
-                <div className="grid-filters">
-                    <div onClick={() => filterNotes("all")} className={(filter == 'all') ? 'rounded-full bg-gradient-to-tl from-fuchsia-600  to-violet-800 text-stone-50' : 'hover:bg-gradient-to-tl from-fuchsia-600 to-slate-900 text-stone-50 rounded-full bg-slate-900 bg-opacity-70 shadow-md'}> All </div>
-                    {filterList}
-                </div>
                 <div className="grid grid-flow-row gap-2 grid-cols-2 md:grid-cols-3">
                     {itemList}
                 </div>
